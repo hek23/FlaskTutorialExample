@@ -1,4 +1,5 @@
-from flask import Flask, request, abort
+from flask import Flask, request, abort, render_template
+import json
 #Estatico, no cambiar
 app = Flask(__name__)
 
@@ -59,6 +60,32 @@ def httpverb(parametroGet= "GetDefault"):
     elif request.method == 'GET':
         #Si usa GET, retorna un texto
         return "El texto es {}".format(parametroGet)
+
+#Tambien podemos definir un manejo propio de errores, retornando un template personal (igual tiene un poquito que ver APIREST)
+#Eso se realiza similar a la asignacion de rutas, pero esta vez vamos a manejar el error
+#En este caso se maneja el error 404
+@app.errorhandler(404)
+#Se define la funcion que maneja el error. SIEMPRE se debe tener el error, el cual se contiene en la variable "e" que se
+#pasa como parámetro en este caso
+def page_not_found(e):
+    #Luego retornamos la vista en html con render_template, que recibe el nombre del archivo html. Estos SIEMPRE
+    #deben estar contenidos en una carpeta llamada templates, tal como se ve en este tutorial. Luego, se debe pasar
+    #al usuario/cliente (en el return), el código del error.
+    return render_template('404.html'), 404
+
+########################################################################################################################
+############################EXTRAS######################################################################################
+########################################################################################################################
+#Además existen directivas para verificar elementos antes y despues de las consultas. Esto se hace con before y after request
+#Se debe tener ojo que esto se hace SIEMPRE y en CUALQUIER RUTA.
+#Las funciones se llamaron asi solo por comodidad.
+@app.before_request
+def before_request():
+    print ("Verificacion antes del request")
+
+@app.after_request
+def after_request():
+    print ("After request!")
 
 if __name__ == "__main__":
 #Inicia la instancia de Flask
