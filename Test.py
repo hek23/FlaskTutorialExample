@@ -1,6 +1,4 @@
-from flask import Flask
-from flask import request
-
+from flask import Flask, request, abort
 #Estatico, no cambiar
 app = Flask(__name__)
 
@@ -30,11 +28,38 @@ def ejemploParametros():
 #Dentro de ella, lo escrito entre signos menor mayor (< >), es el parámetro que PUEDE
 #existir, pero también puede que no, por ello se debe marcar el valor por defecto. Además se referencia a una sola función
 #desde dos rutas distintas
+#Se debe tener ojo que tiene que tenerse cubierto el "arbol" o "rama" de rutas y subrutas
+
+#Otra de las cosas que se debe notar es que se pueden tener validadores de tipo de datos. Esto se ve en la 4ta ruta
+#En esa ruta se valida que numero sea de tipo int. Asi, la validacion es de esta forma <TIPODATO:DATO>
 
 @app.route('/multiparam/')
-@app.route('/multiparam/<argumentoOpc>/')
-def multiparam(valor = 'valorpordefecto'):
-    return valor
+@app.route('/multiparam/<argumento_opc>/')
+@app.route('/multiparam/<argumento_opc>/<argumento_interno>/')
+@app.route('/multiparam/<argumento_opc>/<argumento_interno>/<int:numero>')
+def multiparam(argumento_opc = 'valorpordefecto', argumento_interno = 'No esta!', numero = 0):
+    return "el valor es: {} y el interno es {}. el numero es {}".format(argumento_opc, argumento_interno, numero)
+
+#También se puede limitar o fijar el o los métodos utilizables. Esto se hace mediante la propiedad "methods" en
+#la definicion de la ruta.
+#En este caso se fija una ruta con metodo GET y POST, la cual realiza dos respuestas distintas según método
+
+@app.route('/httpverb', methods = ['GET', 'POST'])
+@app.route('/httpverb/<parametroGet>/')
+def httpverb(parametroGet= "GetDefault"):
+    #Se verifica si el metodo usado es POST
+    if request.method == 'POST':
+        #Si no se envio un JSON como tal, se aborta y arroja error 400
+        if not request.json:
+            return abort(400)
+        else:
+            #Si no, se retorna el JSON recibido
+            return json.dumps(request.json)
+
+    elif request.method == 'GET':
+        #Si usa GET, retorna un texto
+        return "El texto es {}".format(parametroGet)
+
 if __name__ == "__main__":
 #Inicia la instancia de Flask
 #Opciones:
