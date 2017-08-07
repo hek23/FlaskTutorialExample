@@ -1,7 +1,13 @@
-from flask import Flask, request, abort, render_template
+from flask import Flask, request, abort, render_template, g
+from config import DevelopmentConfig
 import json
 #Estatico, no cambiar
 app = Flask(__name__)
+
+#Aqui se setean las configuraciones personalizadas. Vease Config.py
+#Para ello, se pasa como algumento a la función la clase hijo (o más especializada)
+#que contiene la configuracion para el entorno especifico
+app.config.from_object(DevelopmentConfig)
 
 #Decorador. Indica una referencia o ruta a la funcion indicada abajo
 @app.route('/')
@@ -73,6 +79,18 @@ def page_not_found(e):
     #al usuario/cliente (en el return), el código del error.
     return render_template('404.html'), 404
 
+#Tambien se pueden tener variables globales. Estas variables permiten pasar elementos entre funciones de la consulta. 
+#El contenedor de la variable (denotada como g), se inicializa en el before_request, y se termina (o borra) en el after_request
+#(véase funciones before_request y after_request)
+
+@app.route('/modificarGlobal')
+def modificarGlobal():
+    g.test = "variable modificada"
+    return g.test
+
+#VEASE ARCHIVO CONFIG
+
+
 ########################################################################################################################
 ############################EXTRAS######################################################################################
 ########################################################################################################################
@@ -81,15 +99,18 @@ def page_not_found(e):
 #Las funciones se llamaron asi solo por comodidad.
 @app.before_request
 def before_request():
+    g.test = "Variable global!"
     print ("Verificacion antes del request")
 
 @app.after_request
 def after_request():
+    print (g.test)
     print ("After request!")
+
 
 if __name__ == "__main__":
 #Inicia la instancia de Flask
 #Opciones:
 #port: puerto para el servidor rest. Por default es 5000
 #debug: activa modo debug (booleano). Activar para desarrollar
-    app.run(debug = True)
+    app.run()
