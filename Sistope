@@ -1,0 +1,9 @@
+Proceso: Instancia de un programa en ejecucion
+Glick: Libreria que invoca syscall
+Syscall: Forma de solicitar servicios CUIDADO!... Los limites y uso de otros procesos son importantes
+User/Kernel Mode: Privilegios!
+Kernel Mode -> Rutinas de sistema
+User Mode -> Otros procesos
+Syscall varian en funcion del sistema
+
+
